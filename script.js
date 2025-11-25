@@ -211,14 +211,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stopScanner() {
+        // 1. Oculta la pantalla del escáner inmediatamente
+        qrScannerContainer.classList.add('hidden');
+
+        // 2. Intenta detener la cámara de forma segura
         try {
             if (html5QrCode.isScanning) {
                 html5QrCode.stop();
             }
         } catch (err) {
-            // Ignorar error si el escáner ya estaba detenido
+            console.warn("El escáner de QR ya estaba detenido.", err);
         }
-        qrScannerContainer.classList.add('hidden');
+        
+        // 3. Limpia la variable de memoria
         activeInputId = null;
     }
 
@@ -226,4 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btnScanQr.addEventListener('click', () => startScanner('numero-envio'));
     btnScanQrNe.addEventListener('click', () => startScanner('ne-numero-envio'));
     btnCloseScanner.addEventListener('click', stopScanner);
+
+    // --- LÓGICA MEJORADA PARA EL BOTÓN "VOLVER" DEL ESCÁNER ---
+    // Esta nueva función se asegura de que siempre volvamos al Home.
+    function closeScannerAndGoHome() {
+        stopScanner(); // Primero, detiene la cámara y oculta el escáner.
+        // Luego, oculta todas las vistas de formularios y muestra la de inicio.
+        viewEntrega.classList.add('hidden');
+        viewNoEntrega.classList.add('hidden');
+        viewHome.classList.remove('hidden');
+    }
+    btnCloseScanner.addEventListener('click', closeScannerAndGoHome);
 });
