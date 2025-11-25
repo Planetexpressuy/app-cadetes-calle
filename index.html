@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Librería para leer códigos QR -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <title>Planet Express - Cadetería</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -34,8 +36,8 @@
                 <form id="form-entrega">
                     <label for="numero-envio">Número de Envío</label>
                     <div class="input-group">
-                        <input type="text" id="numero-envio" placeholder="Ingresa o escanea el n°" required>
                         <button type="button" id="btn-scan-qr" class="btn-icon">QR</button>
+                        <input type="text" id="numero-envio" placeholder="Ingresa o escanea el n°" required>
                     </div>
 
                     <label for="nombre-recibe">Nombre de quien recibe</label>
@@ -61,10 +63,10 @@
             <main>
                 <h2 class="view-title">Registrar Visita Fallida</h2>
                 <form id="form-no-entrega">
-                    <label for="ne-numero-envio">Número de Envío</p></label>
+                    <label for="ne-numero-envio">Número de Envío</label>
                     <div class="input-group">
-                        <input type="text" id="ne-numero-envio" placeholder="Ingresa o escanea el n°" required>
                         <button type="button" id="ne-btn-scan-qr" class="btn-icon">QR</button>
+                        <input type="text" id="ne-numero-envio" placeholder="Ingresa o escanea el n°" required>
                     </div>
 
                     <label for="ne-foto">Foto de la Puerta</label>
@@ -89,6 +91,13 @@
             </main>
         </div>
     </div>
+
+    <!-- Contenedor para el Escáner de QR (Oculto por defecto) -->
+    <div id="qr-scanner-container" class="hidden">
+        <div id="qr-reader"></div>
+        <button id="btn-close-scanner" class="btn btn-secondary">Cancelar</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
