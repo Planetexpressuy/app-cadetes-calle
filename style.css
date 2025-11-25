@@ -98,7 +98,7 @@ body {
 
 /* --- Sistema de Vistas --- */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* --- Estilos del Formulario de Entrega --- */
@@ -207,3 +207,4 @@ input[type="file"] {
     width: 90%;
     max-width: 500px;
 }
+
