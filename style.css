@@ -97,7 +97,7 @@ body {
 
 
 /* --- Sistema de Vistas --- */
-.view.hidden {
+.hidden {
     display: none;
 }
 
@@ -208,3 +208,4 @@ input[type="file"] {
     width: 90%;
     max-width: 500px;
 }
+
