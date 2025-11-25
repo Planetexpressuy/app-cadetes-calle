@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Elementos del Escáner QR
     const qrScannerContainer = document.getElementById('qr-scanner-container');
-    const btnCloseScanner = document.getElementById('btn-close-scanner');
+   // const btnCloseScanner = document.getElementById('btn-close-scanner');
 
     // --- NAVEGACIÓN ENTRE VISTAS ---
 
@@ -257,4 +257,5 @@ document.addEventListener('DOMContentLoaded', () => {
         stopScanner(); // Por si acaso, también detenemos el escáner si estaba abierto.
     });
 });
+
 
