@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Librería para leer códigos QR -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- Configuración de la Web App (Manifiesto y Tema) -->
+    <meta name="theme-color" content="#0066FF">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="Imagenes/logo-espalda-2.webp">
+
     <title>Planet Express - Cadetería</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -95,15 +101,9 @@
     <!-- Contenedor para el Escáner de QR (Oculto por defecto) -->
     <div id="qr-scanner-container" class="hidden">
         <div id="qr-reader"></div>
-       <!-- <button id="btn-close-scanner" class="btn btn-secondary">FINALIZAR</button>  -->
+        <button id="btn-close-scanner" class="btn btn-secondary">Volver</button>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
