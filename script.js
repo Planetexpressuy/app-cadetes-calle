@@ -31,11 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btnEntregar.addEventListener('click', () => {
         viewHome.classList.add('hidden');
         viewEntrega.classList.remove('hidden');
+        // Añadimos un estado al historial para poder volver aquí
+        history.pushState({view: 'entrega'}, '');
     });
 
     btnNoEntregar.addEventListener('click', () => {
         viewHome.classList.add('hidden');
         viewNoEntrega.classList.remove('hidden');
+        // Añadimos un estado al historial para poder volver aquí
+        history.pushState({view: 'no-entrega'}, '');
     });
 
     btnVolver.addEventListener('click', () => {
@@ -230,17 +234,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Asignar la función a los botones
     btnScanQr.addEventListener('click', () => startScanner('numero-envio'));
     btnScanQrNe.addEventListener('click', () => startScanner('ne-numero-envio'));
-    btnCloseScanner.addEventListener('click', stopScanner);
+    // btnCloseScanner.addEventListener('click', stopScanner);
 
     // --- LÓGICA MEJORADA PARA EL BOTÓN "VOLVER" DEL ESCÁNER ---
     // Esta nueva función se asegura de que siempre volvamos al Home.
-    function closeScannerAndGoHome() {
-        stopScanner(); // Primero, detiene la cámara y oculta el escáner.
-        // Luego, oculta todas las vistas de formularios y muestra la de inicio.
+    // function closeScannerAndGoHome() {
+    //     stopScanner(); // Primero, detiene la cámara y oculta el escáner.
+    //     // Luego, oculta todas las vistas de formularios y muestra la de inicio.
+    //     viewEntrega.classList.add('hidden');
+    //     viewNoEntrega.classList.add('hidden');
+    //     viewHome.classList.remove('hidden');
+    // }
+    // btnCloseScanner.addEventListener('click', closeScannerAndGoHome);
+
+    // --- MANEJO DEL BOTÓN "ATRÁS" DEL NAVEGADOR/TELÉFONO ---
+    window.addEventListener('popstate', (event) => {
+        // Esta función se ejecuta cuando el usuario presiona el botón "Atrás" del sistema.
+        // Ocultamos todas las vistas de formularios y mostramos la de inicio.
         viewEntrega.classList.add('hidden');
         viewNoEntrega.classList.add('hidden');
         viewHome.classList.remove('hidden');
-    }
-    btnCloseScanner.addEventListener('click', closeScannerAndGoHome);
+        stopScanner(); // Por si acaso, también detenemos el escáner si estaba abierto.
+    });
 });
-
