@@ -133,8 +133,7 @@ form textarea {
 /* Grupo de Input para el botón de QR */
 .input-group {
     display: flex;
-    gap: 0.5rem;
-    flex-direction: row-reverse; /* Invierte el orden visual de los elementos */
+    gap: 0.5rem;    
     align-items: center;
 }
 
@@ -208,4 +207,3 @@ input[type="file"] {
     width: 90%;
     max-width: 500px;
 }
-
