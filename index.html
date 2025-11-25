@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Express - Cadetería</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Encabezado Principal (Visible en todas las vistas) -->
+        <header class="main-header">
+            <div class="logo-placeholder">
+                <img src="Imagenes/logo-espalda-2.png" alt="Logo Planet Express">
+            </div>
+        </header>
+
+        <!-- Vista Principal (Home) -->
+        <div id="view-home" class="view">
+            <main>
+                <h1 class="view-title">Registrar Visita</h1>
+                <p class="instruction-text">¿Qué visita quieres registrar?</p>
+                <div class="action-buttons">
+                    <button id="btn-entregar" class="btn btn-success">Entregar</button>
+                    <button id="btn-no-entregar" class="btn btn-danger">No Entregar</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Vista de Formulario de Entrega (Oculta por defecto) -->
+        <div id="view-entrega" class="view hidden">
+            <main>
+                <h2 class="view-title">Registrar Entrega</h2>
+                <form id="form-entrega">
+                    <label for="numero-envio">Número de Envío</label>
+                    <div class="input-group">
+                        <input type="text" id="numero-envio" placeholder="Ingresa o escanea el n°" required>
+                        <button type="button" id="btn-scan-qr" class="btn-icon">QR</button>
+                    </div>
+
+                    <label for="nombre-recibe">Nombre de quien recibe</label>
+                    <input type="text" id="nombre-recibe" required>
+
+                    <label for="apellido-recibe">Apellido de quien recibe</label>
+                    <input type="text" id="apellido-recibe" required>
+
+                    <label for="cedula-recibe">Cédula de quien recibe</label>
+                    <input type="text" id="cedula-recibe" pattern="\d*" title="Solo números" required>
+
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" placeholder="(Opcional)"></textarea>
+
+                    <button type="submit" class="btn btn-primary">GUARDAR ENTREGA</button>
+                    <button type="button" id="btn-volver" class="btn btn-secondary">Volver</button>
+                </form>
+            </main>
+        </div>
+
+        <!-- Vista de Formulario de NO Entrega (Oculta por defecto) -->
+        <div id="view-no-entrega" class="view hidden">
+            <main>
+                <h2 class="view-title">Registrar Visita Fallida</h2>
+                <form id="form-no-entrega">
+                    <label for="ne-numero-envio">Número de Envío</p></label>
+                    <div class="input-group">
+                        <input type="text" id="ne-numero-envio" placeholder="Ingresa o escanea el n°" required>
+                        <button type="button" id="ne-btn-scan-qr" class="btn-icon">QR</button>
+                    </div>
+
+                    <label for="ne-foto">Foto de la Puerta</label>
+                    <label class="btn-file-upload" for="ne-foto">
+                        📸 Tomar Foto
+                        <input type="file" id="ne-foto" accept="image/*" capture="environment" required>
+                    </label>
+
+                    <label for="ne-evento">Motivo de la Visita</label>
+                    <select id="ne-evento" required>
+                        <option value="No Hay Nadie" selected>No Hay Nadie</option>
+                        <option value="Ausente no contesta">Ausente no contesta</option>
+                        <option value="Direccion Incorrecta">Dirección Incorrecta</option>
+                    </select>
+
+                    <label for="ne-observaciones">Observaciones</label>
+                    <textarea id="ne-observaciones" placeholder="(Opcional)"></textarea>
+
+                    <button type="submit" class="btn btn-primary">GUARDAR VISITA</button>
+                    <button type="button" id="btn-volver-ne" class="btn btn-secondary">Volver</button>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
