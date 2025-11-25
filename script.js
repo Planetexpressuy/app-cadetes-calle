@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURACIÓN ---
+    // ¡IMPORTANTE! Aquí pegarás la URL que obtendrás de Google Apps Script.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2vm8OOLkxbOHp2zStXPurxDClXmGsRkGQfoVkuTSvvlmlqpLlZnV9jGFkDHnDachq/exec";
+
     // Vistas
     const viewHome = document.getElementById('view-home');
     const viewEntrega = document.getElementById('view-entrega');
@@ -10,9 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVolver = document.getElementById('btn-volver');
     const btnVolverNe = document.getElementById('btn-volver-ne');
 
+    // Botones de QR
+    const btnScanQr = document.getElementById('btn-scan-qr');
+    const btnScanQrNe = document.getElementById('ne-btn-scan-qr');
+
     // Formularios
     const formEntrega = document.getElementById('form-entrega');
     const formNoEntrega = document.getElementById('form-no-entrega');
+
+    // Elementos del Escáner QR
+    const qrScannerContainer = document.getElementById('qr-scanner-container');
+    const btnCloseScanner = document.getElementById('btn-close-scanner');
 
     // --- NAVEGACIÓN ENTRE VISTAS ---
 
@@ -40,42 +52,178 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DEL FORMULARIO DE ENTREGA ---
 
-    formEntrega.addEventListener('submit', (e) => {
+    formEntrega.addEventListener('submit', async (e) => {
         e.preventDefault(); // Evitamos que la página se recargue
+        const submitButton = formEntrega.querySelector('button[type="submit"]');
+        setLoading(submitButton, true, "Guardando...");
 
-        // Capturamos los datos que el cadete ingresó
-        const datosEntrega = {
-            numeroEnvio: document.getElementById('numero-envio').value,
-            nombreRecibe: document.getElementById('nombre-recibe').value,
-            apellidoRecibe: document.getElementById('apellido-recibe').value,
-            cedulaRecibe: document.getElementById('cedula-recibe').value,
-            observaciones: document.getElementById('observaciones').value,
-        };
+        try {
+            const location = await getCurrentLocation();
 
-        console.log("Datos del formulario de entrega:", datosEntrega);
-        alert("Simulación: Entrega guardada. Revisa la consola para ver los datos.");
+            // Combinamos datos manuales y automáticos
+            const datosEntrega = {
+                type: 'entrega', // Para que el script de Google sepa qué hacer
+                numeroEnvio: document.getElementById('numero-envio').value,
+                nombreRecibe: document.getElementById('nombre-recibe').value,
+                apellidoRecibe: document.getElementById('apellido-recibe').value,
+                cedulaRecibe: document.getElementById('cedula-recibe').value,
+                observaciones: document.getElementById('observaciones').value,
+                timestamp: new Date().toISOString(),
+                location: `${location.latitude}, ${location.longitude}`,
+                status: 'Entregado'
+            };
 
-        formEntrega.reset(); // Limpiamos el formulario
-        btnVolver.click(); // Simulamos un clic en "Volver" para regresar al inicio
+            // Enviamos los datos
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Necesario para peticiones simples a Apps Script
+                body: JSON.stringify(datosEntrega),
+            });
+
+            // NOTA: Con 'no-cors', no podemos leer la respuesta, pero la petición se envía.
+            // Asumimos éxito si no hay un error de red.
+            // if (!response.ok) throw new Error('Error en la respuesta del servidor.');
+
+            alert('¡Entrega guardada con éxito!');
+            btnVolver.click();
+
+        } catch (error) {
+            console.error('Error al guardar entrega:', error);
+            alert(`Error: ${error.message}. No se pudo guardar la entrega.`);
+        } finally {
+            setLoading(submitButton, false, "GUARDAR ENTREGA");
+        }
     });
 
     // --- LÓGICA DEL FORMULARIO DE NO ENTREGA ---
 
-    formNoEntrega.addEventListener('submit', (e) => {
+    formNoEntrega.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const submitButton = formNoEntrega.querySelector('button[type="submit"]');
+        setLoading(submitButton, true, "Guardando...");
 
-        const datosVisitaFallida = {
-            numeroEnvio: document.getElementById('ne-numero-envio').value,
-            foto: document.getElementById('ne-foto').files[0], // Capturamos el objeto del archivo
-            evento: document.getElementById('ne-evento').value,
-            observaciones: document.getElementById('ne-observaciones').value,
-        };
+        try {
+            const location = await getCurrentLocation();
+            const file = document.getElementById('ne-foto').files[0];
+            if (!file) throw new Error("Por favor, toma una foto.");
 
-        console.log("Datos de visita fallida:", datosVisitaFallida);
-        // Mostramos el nombre del archivo de la foto para confirmar
-        alert(`Simulación: Visita fallida guardada. Foto: ${datosVisitaFallida.foto.name}. Revisa la consola.`);
+            const fileData = await readFileAsBase64(file);
 
-        formNoEntrega.reset();
-        btnVolverNe.click();
+            const datosVisitaFallida = {
+                type: 'no-entrega', // Para que el script de Google sepa qué hacer
+                numeroEnvio: document.getElementById('ne-numero-envio').value,
+                evento: document.getElementById('ne-evento').value,
+                observaciones: document.getElementById('ne-observaciones').value,
+                timestamp: new Date().toISOString(),
+                location: `${location.latitude}, ${location.longitude}`,
+                foto: fileData // Enviamos la foto como texto Base64
+            };
+
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Necesario para peticiones simples a Apps Script
+                body: JSON.stringify(datosVisitaFallida),
+            });
+
+            // NOTA: Con 'no-cors', no podemos leer la respuesta.
+            // if (!response.ok) throw new Error('Error en la respuesta del servidor.');
+
+            alert('¡Visita guardada con éxito!');
+            btnVolverNe.click();
+
+        } catch (error) {
+            console.error('Error al guardar visita:', error);
+            alert(`Error: ${error.message}. No se pudo guardar la visita.`);
+        } finally {
+            setLoading(submitButton, false, "GUARDAR VISITA");
+        }
     });
+
+    // --- FUNCIONES AUXILIARES ---
+
+    // Muestra un estado de carga en los botones
+    function setLoading(button, isLoading, text) {
+        button.disabled = isLoading;
+        button.textContent = text;
+    }
+
+    // Obtiene la ubicación GPS
+    function getCurrentLocation() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                return reject(new Error('Geolocalización no soportada por el navegador.'));
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => resolve(position.coords),
+                (error) => reject(new Error(`Error de geolocalización: ${error.message}`))
+            );
+        });
+    }
+
+    // Lee un archivo (la foto) y lo convierte a texto Base64 para poder enviarlo
+    function readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                // El resultado es un string largo que representa la imagen
+                resolve({
+                    base64: reader.result.split(',')[1], // Quitamos el prefijo 'data:image/jpeg;base64,'
+                    type: file.type,
+                    name: file.name
+                });
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // --- LÓGICA DEL ESCÁNER QR ---
+
+    // Crear una instancia del lector de QR
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    let activeInputId = null; // Para saber en qué campo de texto poner el resultado
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        // Cuando se escanea un código, esta función se ejecuta.
+        console.log(`Código escaneado: ${decodedText}`, decodedResult);
+        
+        // Pone el texto del QR en el campo de texto activo
+        if (activeInputId) {
+            document.getElementById(activeInputId).value = decodedText;
+        }
+
+        // Detiene la cámara y cierra el escáner
+        stopScanner();
+    };
+
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+    function startScanner(targetInputId) {
+        activeInputId = targetInputId;
+        qrScannerContainer.classList.remove('hidden');
+        // Inicia la cámara. Pide permiso al usuario si es la primera vez.
+        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+            .catch(err => {
+                console.error("No se pudo iniciar el escáner de QR", err);
+                alert("Error al iniciar la cámara. Asegúrate de dar los permisos necesarios.");
+                stopScanner();
+            });
+    }
+
+    function stopScanner() {
+        try {
+            if (html5QrCode.isScanning) {
+                html5QrCode.stop();
+            }
+        } catch (err) {
+            // Ignorar error si el escáner ya estaba detenido
+        }
+        qrScannerContainer.classList.add('hidden');
+        activeInputId = null;
+    }
+
+    // Asignar la función a los botones
+    btnScanQr.addEventListener('click', () => startScanner('numero-envio'));
+    btnScanQrNe.addEventListener('click', () => startScanner('ne-numero-envio'));
+    btnCloseScanner.addEventListener('click', stopScanner);
 });
